@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/jeebeys/go-transaction/aop"
 	"github.com/jeebeys/go-transaction/ast"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -46,7 +45,7 @@ func (c *TransactionConfig) Reload() error {
 	return nil
 }
 
-func (t *TransactionManager) RegisterDao(daoLs ...interface{}) (tm *TransactionManager) {
+func (t *TransactionManager) Register(daoLs ...interface{}) (tm *TransactionManager) {
 	tm = t
 	for _, v := range daoLs {
 		aop.RegisterPoint(reflect.TypeOf(v))
@@ -55,7 +54,7 @@ func (t *TransactionManager) RegisterDao(daoLs ...interface{}) (tm *TransactionM
 }
 
 func scanGoFile() {
-	filepath.Walk(config.ScanPath, walkFunc)
+	_ = filepath.Walk(config.ScanPath, walkFunc)
 }
 
 func walkFunc(fullPath string, info os.FileInfo, err error) error {
@@ -74,7 +73,7 @@ func walkFunc(fullPath string, info os.FileInfo, err error) error {
 }
 
 func cacheMethodLocationMap(fullPath string) {
-	bt, err := ioutil.ReadFile(fullPath)
+	bt, err := os.ReadFile(fullPath)
 	if err != nil {
 		return
 	}

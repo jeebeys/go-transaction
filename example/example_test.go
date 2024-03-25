@@ -8,10 +8,10 @@ import (
 
 func TestDao(t *testing.T) {
 	scanPath := `D:\src\workspace.golang.project\go-transaction\example`
-	transaction.NewTransactionManager(transaction.TransactionConfig{ScanPath: scanPath}).RegisterDao(new(ExampleDao))
+	transaction.NewTransactionManager(transaction.TransactionConfig{ScanPath: scanPath}).Register(new(ExampleDao))
 
 	dao := new(ExampleDao)
-	dao.Select()
-	dao.Update(new(xorm.Session), "") // auto commit
-	dao.Delete(new(xorm.Session))     // handle fail and auto rollback
+	_, _ = dao.Select()
+	_, _ = dao.Update(new(xorm.Session), "") // auto commit
+	_, _ = dao.Delete(new(xorm.Session))     // handle fail and auto rollback
 }
