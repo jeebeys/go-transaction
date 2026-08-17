@@ -1,10 +1,11 @@
 package aop
 
 import (
-	"bou.ke/monkey"
 	"fmt"
 	"reflect"
 	"strings"
+
+	"bou.ke/monkey"
 )
 
 type JoinPoint struct {

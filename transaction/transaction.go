@@ -1,9 +1,12 @@
 package transaction
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/go-xorm/xorm"
 	"github.com/jeebeys/go-transaction/aop"
-	"reflect"
+	"gorm.io/gorm"
 )
 
 var methodSessionMap = make(map[string]*joinPointSessionInfo)
@@ -20,6 +23,7 @@ type Transactional struct {
 }
 
 func (t *Transactional) Before(point *aop.JoinPoint, methodLocation string) bool {
+
 	if methodSessionMap[methodLocation] != nil {
 		t.doSessionBegin(point.Params[methodSessionMap[methodLocation].SessionIndex].Interface())
 	} else {
@@ -33,6 +37,7 @@ func (t *Transactional) Before(point *aop.JoinPoint, methodLocation string) bool
 			}
 		}
 	}
+	fmt.Println("transactional before", methodLocation, methodSessionMap, point.Params)
 	return true
 }
 
@@ -54,6 +59,8 @@ func (t *Transactional) After(point *aop.JoinPoint, methodLocation string) {
 			}
 		}
 	}
+
+	fmt.Println("transactional After", methodLocation, methodSessionMap, point.Result)
 }
 
 func (t *Transactional) Finally(point *aop.JoinPoint, methodLocation string) {
@@ -62,6 +69,7 @@ func (t *Transactional) Finally(point *aop.JoinPoint, methodLocation string) {
 	} else {
 
 	}
+	fmt.Println("transactional Finally", methodLocation, methodSessionMap, point.Result)
 }
 
 func (t *Transactional) IsMatch(methodLocation string) bool {
@@ -75,7 +83,10 @@ func (t *Transactional) IsMatch(methodLocation string) bool {
 func (t *Transactional) doSessionBegin(v interface{}) bool {
 	switch ses := v.(type) {
 	case *xorm.Session:
-		ses.Begin()
+		_ = ses.Begin()
+		return true
+	case *gorm.DB:
+		_ = ses.Begin()
 		return true
 	default:
 		return false
@@ -85,7 +96,10 @@ func (t *Transactional) doSessionBegin(v interface{}) bool {
 func (t *Transactional) doSessionCommit(v interface{}) bool {
 	switch ses := v.(type) {
 	case *xorm.Session:
-		ses.Commit()
+		_ = ses.Commit()
+		return true
+	case *gorm.DB:
+		_ = ses.Commit()
 		return true
 	default:
 		return false
@@ -95,7 +109,10 @@ func (t *Transactional) doSessionCommit(v interface{}) bool {
 func (t *Transactional) doSessionRollback(v interface{}) bool {
 	switch ses := v.(type) {
 	case *xorm.Session:
-		ses.Rollback()
+		_ = ses.Rollback()
+		return true
+	case *gorm.DB:
+		_ = ses.Rollback()
 		return true
 	default:
 		return false
@@ -103,9 +120,12 @@ func (t *Transactional) doSessionRollback(v interface{}) bool {
 }
 
 func (t *Transactional) doSessionClose(v interface{}) bool {
+	fmt.Println("close", v)
 	switch ses := v.(type) {
 	case *xorm.Session:
 		ses.Close()
+		return true
+	case *gorm.DB:
 		return true
 	default:
 		return false

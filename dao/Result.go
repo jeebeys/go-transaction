@@ -5,6 +5,7 @@ var (
 	FAILURE = Result{result: false}
 )
 
+// Result 暂时无用
 type Result struct {
 	result bool
 	object interface{}

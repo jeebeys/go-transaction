@@ -99,6 +99,7 @@ func analysisComment(pkgName string, decl *ast.FuncDecl, result *AnalysisResult,
 
 func isContainComment(lines []*ast.Comment, targetComment string) bool {
 	for _, l := range lines {
+		fmt.Println("=====>", l)
 		c := strings.TrimSpace(strings.TrimLeft(l.Text, comment_prefix))
 		if c == targetComment {
 			return true
